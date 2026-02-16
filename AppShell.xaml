@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<Shell
+    x:Class="Week3_L1.AppShell"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:local="clr-namespace:Week3_L1"
+    xmlns:views="clr-namespace:Week3_L1.Views"
+    Title="Week3_L1">
+
+    <FlyoutItem Title="Introduction">
+            <ShellContent
+                Title="StartPage"
+                ContentTemplate="{DataTemplate views:StartPage}"
+                Route="startpage" />
+    </FlyoutItem>
+
+    <FlyoutItem Title="Students">
+        <ShellContent
+                Title="Students"
+                ContentTemplate="{DataTemplate views:StudentView}"
+                Route="StudentView" />
+    </FlyoutItem>
+    <Shell.FlyoutFooter>
+        <Button
+            Text="Logout"
+            TextColor="White"
+            BackgroundColor="Red"
+            Command="{Binding LogoutCommand}" />
+    </Shell.FlyoutFooter>
+
+</Shell>
