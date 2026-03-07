@@ -135,6 +135,17 @@ namespace Week3_L1.ViewModels
 
         public async Task LoadServiceDataAsync()
         {
+              // Check if logged in
+            var token = await SecureStorage.GetAsync("auth_token");
+
+            if (token == null)
+            {
+                // Not logged in — go to login page
+                await Shell.Current.GoToAsync("LoginPage");
+                return;
+            }
+
+            // Logged in — load students normally
             try
             {
                 await ApplyFilter();

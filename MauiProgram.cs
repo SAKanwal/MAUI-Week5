@@ -28,7 +28,7 @@ namespace Week3_L1
             //var firebaseClient = new FirebaseClient(firebase_App_url);
             //builder.Services.AddSingleton(firebaseClient);
 
-            var baseAddress = "http://127.0.0.1:5001/";
+            var baseAddress = "http://127.0.0.1:5001/";// for android emulator"http://10.0.2.2:5001/";
 
             // Register HttpClient
             HttpClient httpClient = new HttpClient
@@ -48,6 +48,8 @@ namespace Week3_L1
             builder.Services.AddTransient<StudentViewModel>();
             builder.Services.AddTransient<StartPage>();
             builder.Services.AddTransient<StudentView>();
+            builder.Services.AddTransient<LoginPageViewModel>();
+            builder.Services.AddTransient<LoginPage>();
             return builder.Build();
         }
     }

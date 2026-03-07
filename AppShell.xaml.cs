@@ -10,10 +10,14 @@ namespace Week3_L1
             InitializeComponent();
             BindingContext = this;
             Routing.RegisterRoute("studentDetailPage", typeof(StudentDetailPage));
+            Routing.RegisterRoute("LoginPage", typeof(LoginPage));  // <-- ADD
+
         }
         public ICommand LogoutCommand =>
        new Command(async () =>
        {
+        // Clear token
+            SecureStorage.Remove("auth_token");
            await Shell.Current.GoToAsync("//startpage");
        });
 

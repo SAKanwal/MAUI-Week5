@@ -19,6 +19,9 @@ namespace Week3_L1.Services
         Task<int> GetTotalCountAsync();
 
         event EventHandler<StudentChangedEventArgs>? StudentChanged;
+
+        Task<bool> LoginAsync(string username, string password);  // <-- ADD
+
     }
 
     public class StudentChangedEventArgs : EventArgs

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http.Json;
+using System.Net.Http.Headers;
 using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
@@ -14,6 +15,7 @@ public class FastApiStudentService : IStudentServices
 
     // Dictionary<StudentId, Student> — fast lookup by id
     private readonly Dictionary<int, Student> _studentCache = new();
+    private record TokenResponse(string access_token, string token_type);
 
     public event EventHandler<StudentChangedEventArgs>? StudentChanged;
 
@@ -21,10 +23,60 @@ public class FastApiStudentService : IStudentServices
     {
         _http = http;
     }
+    /// <summary>
+/// Logs in with hardcoded credentials and stores the JWT token.
+/// Call this once when the app starts, before making any write requests.
+/// </summary>
+    public async Task<bool> LoginAsync(string username, string password)
+    {
+        var formContent = new FormUrlEncodedContent(new[]
+        {
+            // new KeyValuePair<string, string>("username", "admin"),
+            // new KeyValuePair<string, string>("password", "secret123"),
+            new KeyValuePair<string, string>("username",username),
+            new KeyValuePair<string, string>("password",password)
+        });
+        var response = await _http.PostAsync("auth/login", formContent);
+        var token = await response.Content.ReadFromJsonAsync<TokenResponse>();
+        if (token != null)
+        {
+        // 1. Store it securely on the device
+        await SecureStorage.SetAsync("auth_token", token.access_token);
+
+        // 2. Attach to HTTP client for this session
+        _http.DefaultRequestHeaders.Authorization =
+            new AuthenticationHeaderValue("Bearer", token.access_token);
+        return true;}
+        else        {
+            return false;
+        }
+    }
+    /// <summary>Clear the token on logout.</summary>
+    private void Logout()
+    {
+        _http.DefaultRequestHeaders.Authorization = null;
+    }
+    private async Task TryRestoreSessionAsync()
+{
+    var token = await SecureStorage.GetAsync("auth_token");
+    if (token != null)
+    {
+        // Token found — restore silently, no login needed
+        _http.DefaultRequestHeaders.Authorization =
+            new AuthenticationHeaderValue("Bearer", token);
+    }
+    else
+    {
+        // No token found — do a fresh login
+        //await LoginAsync();
+    }
+}
 
     // ---- GET ALL — fetch once, cache in dictionary ----
     public async Task<List<Student>> GetAllStudentsAsync()
     {
+        await TryRestoreSessionAsync();
+
         // If dictionary already has data — return local copy instantly
         if (_studentCache.Any())
         {
